@@ -4,19 +4,35 @@ import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from "react
 import { useRouter } from "expo-router";
 import { ThemeContext } from "./ThemeContext";
 
+// Datos de ejemplo
 const books = [
-  { id: 1, title: "Cien años de soledad", author: "Gabriel García Márquez", description:"Una novela sobre la soledad y el destino de la familia Buendía en el pueblo de Macondo.", available: 3 },
-  { id: 2, title: "Clean Code", author: "Robert C. Martin", description:"Un libro sobre las mejores prácticas de programación y cómo escribir código limpio.", available: 5 },
+  {
+    id: 1,
+    title: "Cien años de soledad",
+    author: "Gabriel García Márquez",
+    description: "Una novela sobre la soledad y el destino de la familia Buendía en el pueblo de Macondo.",
+    available: 3,
+  },
+  {
+    id: 2,
+    title: "Clean Code",
+    author: "Robert C. Martin",
+    description: "Un libro sobre las mejores prácticas de programación y cómo escribir código limpio.",
+    available: 5,
+  },
 ];
 
-export default function Books() {
+export default function BooksIndex() {
   const router = useRouter();
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
 
   return (
     <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
-      <Text style={[styles.header, isDark ? styles.headerDark : styles.headerLight]}>Catálogo de Libros</Text>
+      <Text style={[styles.header, isDark ? styles.headerDark : styles.headerLight]}>
+        Catálogo de Libros
+      </Text>
+
       <FlatList
         data={books}
         keyExtractor={(item) => String(item.id)}
@@ -29,6 +45,7 @@ export default function Books() {
               <Text style={[styles.info, isDark ? styles.infoDark : styles.infoLight]}>
                 Disponibles: {item.available}
               </Text>
+
               <TouchableOpacity
                 style={[styles.button, isDark ? styles.buttonDark : styles.buttonLight]}
                 onPress={() => router.push({ pathname: "/book-detail", params: item })}
@@ -44,22 +61,18 @@ export default function Books() {
 }
 
 const styles = StyleSheet.create({
-  // Containers
   container: { flex: 1, padding: 20 },
   containerLight: { backgroundColor: "#ffd900" },
   containerDark: { backgroundColor: "#0b1220" },
 
-  // Headers
   header: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
   headerLight: { color: "#1E3A8A" },
   headerDark: { color: "#fff" },
 
-  // Cards
   card: { flexDirection: "row", borderRadius: 10, marginBottom: 12, padding: 12, elevation: 2 },
   cardLight: { backgroundColor: "#fff" },
   cardDark: { backgroundColor: "#1a1a1a" },
 
-  // Texts
   title: { fontSize: 16, fontWeight: "600" },
   titleLight: { color: "#111827" },
   titleDark: { color: "#fff" },
@@ -72,14 +85,10 @@ const styles = StyleSheet.create({
   infoLight: { color: "#111827" },
   infoDark: { color: "#e6e6e6" },
 
-  // Button
   button: { padding: 8, borderRadius: 6, marginTop: 6, alignItems: "center" },
   buttonLight: { backgroundColor: "#1E3A8A" },
   buttonDark: { backgroundColor: "#374151" },
 
   btnText: { color: "#fff" },
-
-  // Image
   img: { width: 60, height: 80, borderRadius: 4, marginRight: 12 },
 });
-
