@@ -1,33 +1,20 @@
 import express from "express";
 import cors from "cors";
-import mysql from "mysql2";
 import dotenv from "dotenv";
+import librosRouter from "./routes/libros.js";
+import usuariosRouter from "./routes/usuarios.js";
+import prestamosRouter from "./routes/prestamos.js";
+import { db } from "./config/db.js";
 
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME || "biblioteca"
-});
+app.use("/libros", librosRouter);
+app.use("/usuarios", usuariosRouter);
+app.use("/prestamos", prestamosRouter);
 
-db.connect(err => {
-  if (err) {
-    console.error("Error de conexión a la base de datos:", err);
-  } else {
-    console.log("Conexión a MySQL exitosa");
-  }
-});
-
-app.get("/libros", (req, res) => {
-  db.query("SELECT * FROM Libro", (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.json(result);
-  });
-});
+app.get("/", (req, res) => res.send("API de Biblioteca en funcionamiento"));
 
 app.listen(4000, () => console.log("Servidor corriendo en puerto 4000"));
