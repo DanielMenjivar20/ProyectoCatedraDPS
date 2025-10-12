@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "titulo": "Beach",
+    "autor": "Jeff Bezos",
+    "categoria": "Romance",
+    "imagenUrl": "https://images-na.ssl-images-amazon.com/images/I/51DNaiWfllL._SX329_BO1,204,203,200_.jpg",
+    "disponible": true
+  }
+]
