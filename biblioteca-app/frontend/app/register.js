@@ -1,6 +1,8 @@
+// app/register.js
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from "react-native";
+import axios from "axios";
 
 export default function Register() {
   const router = useRouter();
@@ -8,14 +10,30 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleRegister() {
-    // Simulación de registro
-    alert("Registro exitoso, ahora inicia sesión");
-    router.replace("/login");
+  async function handleRegister() {
+    if (!name || !email || !password) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
+      return;
+    }
+
+    try {
+      // ⚡ Cambiado a 10.0.2.2 para que el emulador pueda acceder al backend
+      const res = await axios.post("http://10.0.2.2:3000/api/usuarios", {
+        nombre: name, // ⚡ importante: tu backend espera 'nombre'
+        email,
+        password
+      });
+
+      Alert.alert("Éxito", "Registro exitoso, ahora inicia sesión", [
+        { text: "OK", onPress: () => router.replace("/login") }
+      ]);
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      Alert.alert("Error", error.response?.data?.message || "No se pudo registrar");
+    }
   }
 
   return (
-    
     <View style={styles.container}>
       <Text style={styles.header}>Crear Cuenta</Text>
 
