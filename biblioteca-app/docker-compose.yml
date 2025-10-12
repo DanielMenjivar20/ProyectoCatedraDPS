@@ -1,34 +1,43 @@
 version: '3.8'
+
 services:
   db:
     image: mysql:8.0
     container_name: mysql_biblioteca
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: lolo3102
+      MYSQL_ROOT_PASSWORD: 
       MYSQL_DATABASE: biblioteca
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -pbiblioteca123 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     volumes:
       - ./BD/sql_biblioteca.sql:/docker-entrypoint-initdb.d/sql_biblioteca.sql
 
   backend:
     build:
-      context: ./backend
+      context: ./BD-API
       dockerfile: Dockerfile
     container_name: backend_biblioteca
     restart: always
-    ports:
-      - "4000:4000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - DB_HOST=db
       - DB_USER=root
-      - DB_PASS=contraseña
+      - DB_PASS=
       - DB_NAME=biblioteca
+      - PORT=4000
+      - JWT_SECRET=supersecreto_cambialo
+    ports:
+      - "4000:4000"
     volumes:
-      - ./backend:/usr/src/app
+      - ./BD-API:/usr/src/app
     command: npm run start
 
   frontend:
@@ -37,7 +46,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend_biblioteca
     restart: always
-    ports:
-      - "8081:8081"
     depends_on:
       - backend
+    ports:
+      - "8081:8081"
