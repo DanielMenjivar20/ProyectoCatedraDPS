@@ -13,7 +13,6 @@ export default function BooksIndex() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Cambiamos localhost por 10.0.2.2 para el emulador de Android
     axios.get("http://10.0.2.2:3000/api/libros")
       .then((res) => {
         setBooks(res.data);
@@ -45,7 +44,14 @@ export default function BooksIndex() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <View style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}>
-            <Image source={require("../../assets/book-placeholder.png")} style={styles.img} />
+            <Image
+              source={
+                item.imagenUrl
+                  ? { uri: item.imagenUrl }
+                  : require("../../assets/book-placeholder.png")
+              }
+              style={styles.img}
+            />
             <View style={{ flex: 1 }}>
               <Text style={[styles.title, isDark ? styles.titleDark : styles.titleLight]}>{item.titulo}</Text>
               <Text style={[styles.author, isDark ? styles.authorDark : styles.authorLight]}>{item.autor}</Text>
@@ -55,7 +61,7 @@ export default function BooksIndex() {
 
               <TouchableOpacity
                 style={[styles.button, isDark ? styles.buttonDark : styles.buttonLight]}
-                onPress={() => router.push({ pathname: "/book-detail", params: item })}
+                onPress={() => router.push({ pathname: "/book-detail", params: { id: item.id } })}
               >
                 <Text style={styles.btnText}>Ver Detalle</Text>
               </TouchableOpacity>
@@ -92,3 +98,4 @@ const styles = StyleSheet.create({
   btnText: { color: "#fff" },
   img: { width: 60, height: 80, borderRadius: 4, marginRight: 12 },
 });
+

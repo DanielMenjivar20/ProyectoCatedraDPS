@@ -1,21 +1,46 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import axios from "axios";
 
-export default function UserForm() {
-  const { id, nombre, email } = useLocalSearchParams(); // <-- cambiar name por nombre
-  const [userName, setUserName] = useState(nombre || "");
-  const [userEmail, setUserEmail] = useState(email || "");
+export default function EditUser() {
   const router = useRouter();
+  const { id } = useLocalSearchParams(); // id viene como string
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
-  function handleSave() {
-    alert(`Usuario actualizado: ${userName} - ${userEmail}`);
-    router.back();
-  }
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://10.0.2.2:3000/api/usuarios/${id}`);
+        setUserName(res.data.nombre);
+        setUserEmail(res.data.email);
+      } catch (error) {
+        console.error(error.response?.data || error.message);
+        Alert.alert("Error", "No se pudo cargar el usuario");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      await axios.put(`http://10.0.2.2:3000/api/usuarios/${id}`, {
+        nombre: userName,
+        email: userEmail,
+      });
+      Alert.alert("Éxito", "Usuario actualizado correctamente", [
+        { text: "OK", onPress: () => router.back() },
+      ]);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert("Error", "No se pudo actualizar el usuario");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Flecha de volver grande */}
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={styles.backArrow}>←</Text>
       </TouchableOpacity>
@@ -61,3 +86,4 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "#1E3A8A", padding: 14, borderRadius: 8, alignItems: "center" },
   btnText: { color: "#fff", fontWeight: "700" },
 });
+

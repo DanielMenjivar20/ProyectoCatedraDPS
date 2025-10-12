@@ -2,21 +2,23 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Convierte import.meta.url a ruta de archivo válida
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Ruta correcta al JSON
 const usuariosPath = path.join(__dirname, "../data/usuarios.json");
 
-// Leer usuarios
+// 🔹 Asegura que exista el archivo
+const asegurarArchivo = () => {
+  if (!fs.existsSync(usuariosPath)) fs.writeFileSync(usuariosPath, "[]");
+};
+
+// 🔹 Leer usuarios
 const leerUsuarios = () => {
-  if (!fs.existsSync(usuariosPath)) fs.writeFileSync(usuariosPath, "[]"); // crea vacío si no existe
+  asegurarArchivo();
   const data = fs.readFileSync(usuariosPath, "utf-8");
   return JSON.parse(data);
 };
 
-// Guardar usuarios
+// 🔹 Guardar usuarios
 const guardarUsuarios = (usuarios) => {
   fs.writeFileSync(usuariosPath, JSON.stringify(usuarios, null, 2));
 };
@@ -27,7 +29,16 @@ export const obtenerUsuarios = (req, res) => {
   res.json(usuarios);
 };
 
-// POST /api/usuarios (registrar)
+// GET /api/usuarios/:id
+export const obtenerUsuarioPorId = (req, res) => {
+  const { id } = req.params;
+  const usuarios = leerUsuarios();
+  const usuario = usuarios.find(u => u.id === Number(id));
+  if (!usuario) return res.status(404).json({ message: "Usuario no encontrado" });
+  res.json(usuario);
+};
+
+// POST /api/usuarios
 export const registrarUsuario = (req, res) => {
   const { nombre, email, password } = req.body;
   if (!nombre || !email || !password)
@@ -37,7 +48,7 @@ export const registrarUsuario = (req, res) => {
   if (usuarios.find(u => u.email === email))
     return res.status(400).json({ message: "El correo ya está registrado" });
 
-  const id = usuarios.length + 1;
+  const id = usuarios.length ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
   const nuevoUsuario = { id, nombre, email, password };
   usuarios.push(nuevoUsuario);
   guardarUsuarios(usuarios);
@@ -45,7 +56,37 @@ export const registrarUsuario = (req, res) => {
   res.status(201).json(nuevoUsuario);
 };
 
-// POST /api/usuarios/login
+// PUT /api/usuarios/:id
+export const actualizarUsuario = (req, res) => {
+  const { id } = req.params;
+  const { nombre, email } = req.body;
+
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.id === Number(id));
+  if (idx === -1) return res.status(404).json({ message: "Usuario no encontrado" });
+
+  if (!nombre || !email) {
+    return res.status(400).json({ message: "Nombre y correo son obligatorios" });
+  }
+
+  usuarios[idx] = { ...usuarios[idx], nombre, email };
+  guardarUsuarios(usuarios);
+  res.json(usuarios[idx]);
+};
+
+// DELETE /api/usuarios/:id
+export const eliminarUsuario = (req, res) => {
+  const { id } = req.params;
+  const usuarios = leerUsuarios();
+  const idx = usuarios.findIndex(u => u.id === Number(id));
+  if (idx === -1) return res.status(404).json({ message: "Usuario no encontrado" });
+
+  const eliminado = usuarios.splice(idx, 1)[0];
+  guardarUsuarios(usuarios);
+  res.json({ message: "Usuario eliminado", eliminado });
+};
+
+// POST /api/usuarios/login (opcional)
 export const loginUsuario = (req, res) => {
   const { email, password } = req.body;
   const usuarios = leerUsuarios();

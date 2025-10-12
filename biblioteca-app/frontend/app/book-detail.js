@@ -1,13 +1,34 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import axios from "axios";
 
 export default function BookDetail() {
-  const { title, author, available } = useLocalSearchParams();
+  const { id } = useLocalSearchParams(); // id del libro que llega desde la lista
   const router = useRouter();
 
-  const tieneVencido = true; // Simulación: cambiar cuando se conecte elbackend)
+  const [book, setBook] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  function handleLoan() {
+  const tieneVencido = true; // Simulación: cambiar según tu backend
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const res = await axios.get(`http://10.0.2.2:3000/api/libros/${id}`);
+        setBook(res.data);
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo cargar el libro");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
+
+  const handleLoan = () => {
     if (tieneVencido) {
       router.push({
         pathname: "/modal",
@@ -21,27 +42,48 @@ export default function BookDetail() {
         pathname: "/modal",
         params: {
           title: "Solicitar Préstamo",
-          message: `¿Quieres solicitar "${title}"?`,
+          message: `¿Quieres solicitar "${book.titulo}"?`,
           action: "Préstamo registrado"
         }
       });
     }
+  };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+        <ActivityIndicator size="large" color="#1E3A8A" />
+      </View>
+    );
+  }
+
+  if (!book) {
+    return (
+      <View style={styles.container}>
+        <Text>No se encontró el libro.</Text>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}> Detalles de Libro</Text>
-      <Image source={require("../assets/book-placeholder.png")} style={styles.img} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.author}>Autor: {author}</Text>
-      <Text style={styles.meta}>Disponibles: {available}</Text>
+      <Text style={styles.header}>Detalles de Libro</Text>
+
+      <Image
+        source={book.imagenUrl ? { uri: book.imagenUrl } : require("../assets/book-placeholder.png")}
+        style={styles.img}
+      />
+
+      <Text style={styles.title}>{book.titulo}</Text>
+      <Text style={styles.author}>Autor: {book.autor}</Text>
+      <Text style={styles.meta}>Disponibles: {book.disponible ? "Sí" : "No"}</Text>
 
       <TouchableOpacity style={styles.button} onPress={handleLoan}>
         <Text style={styles.btnText}>Solicitar Préstamo</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.link}> Volver al Catálogo</Text>
+        <Text style={styles.link}>Volver al Catálogo</Text>
       </TouchableOpacity>
     </View>
   );
