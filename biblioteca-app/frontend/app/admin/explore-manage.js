@@ -1,7 +1,10 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { useState } from "react";
+import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons'; // npm install @expo/vector-icons
 
 export default function ExploreManage() {
+  const router = useRouter();
   const [recommendations, setRecommendations] = useState([
     { id: 1, title: "📖 El Principito" },
     { id: 2, title: "🔥 1984 - George Orwell" },
@@ -20,7 +23,13 @@ export default function ExploreManage() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>  Gestionar Recomendaciones</Text>
+      {/* Header con flecha de volver */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
+          <Ionicons name="arrow-back" size={28} color="#1E3A8A" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Gestionar Recomendaciones</Text>
+      </View>
 
       <View style={styles.row}>
         <TextInput
@@ -52,7 +61,15 @@ export default function ExploreManage() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#ffffffff" },
-  header: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  iconButton: {
+    marginRight: 10,
+  },
+  header: { fontSize: 22, fontWeight: "700", color: "#1E3A8A" },
   row: { flexDirection: "row", marginBottom: 12 },
   input: { flex: 1, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10 },
   addBtn: { backgroundColor: "#3B82F6", marginLeft: 8, borderRadius: 8, justifyContent: "center", paddingHorizontal: 12 },

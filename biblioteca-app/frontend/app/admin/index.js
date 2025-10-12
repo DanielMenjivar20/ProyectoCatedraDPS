@@ -9,6 +9,10 @@ export default function AdminDashboard() {
       <Text style={styles.header}> Panel de Administración</Text>
 
       <TouchableOpacity style={styles.card} onPress={() => router.push("/admin/add-book")}>
+        <Text style={styles.cardText}> Agregar Libros</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.card} onPress={() => router.push("/admin/manage-books")}>
         <Text style={styles.cardText}> Gestionar Libros</Text>
       </TouchableOpacity>
 

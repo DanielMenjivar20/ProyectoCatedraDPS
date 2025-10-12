@@ -1,18 +1,20 @@
 // app/tabs/profile.js
-import { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useContext, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { ThemeContext } from "./ThemeContext"; 
 
 export default function Profile() {
   const router = useRouter();
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const [modalVisible, setModalVisible] = useState(false);
   const isDark = theme === "dark";
 
-  // Redirige directamente al login
-  function handleLogoutConfirm() {
+  const handleLogout = () => {
+    setModalVisible(false);
+    // Limpiar datos de sesión si es necesario
     router.push("/login");
-  }
+  };
 
   return (
     <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
@@ -23,7 +25,7 @@ export default function Profile() {
       <Text style={[styles.item, isDark ? styles.itemDark : styles.itemLight]}>Rol: Estudiante</Text>
       <Text style={[styles.item, isDark ? styles.itemDark : styles.itemLight]}>Matrícula: 20251234</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogoutConfirm}>
+      <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.btnText}>Cerrar Sesión</Text>
       </TouchableOpacity>
 
@@ -35,6 +37,30 @@ export default function Profile() {
           Cambiar a {isDark ? "Modo Claro" : "Modo Oscuro"}
         </Text>
       </TouchableOpacity>
+
+      {/* Modal de confirmación */}
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={[styles.modalContainer, isDark && styles.modalContainerDark]}>
+            <Text style={[styles.modalTitle, isDark && styles.itemDark]}>Cerrar Sesión</Text>
+            <Text style={[styles.modalMessage, isDark && styles.itemDark]}>¿Seguro que deseas cerrar sesión?</Text>
+            <View style={styles.modalButtons}>
+              <Pressable style={[styles.modalBtn, { backgroundColor: "#EF4444" }]} onPress={handleLogout}>
+                <Text style={styles.btnText}>Sí</Text>
+              </Pressable>
+              <Pressable style={[styles.modalBtn, { backgroundColor: "#6B7280" }]} onPress={() => setModalVisible(false)}>
+                <Text style={styles.btnText}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
@@ -56,5 +82,47 @@ const styles = StyleSheet.create({
   modeBtn: { padding: 14, borderRadius: 8, marginTop: 12, alignItems: "center" },
   modeBtnLight: { backgroundColor: "#1E3A8A" },
   modeBtnDark: { backgroundColor: "#374151" },
-  btnText: { color: "#fff", fontWeight: "700" }
+  btnText: { color: "#fff", fontWeight: "700" },
+
+  // Modal
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContainer: {
+    width: 300,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalContainerDark: {
+    backgroundColor: "#1f1f1f",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  modalBtn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
 });
+

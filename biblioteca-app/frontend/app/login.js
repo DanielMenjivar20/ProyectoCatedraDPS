@@ -22,9 +22,16 @@ export default function Login() {
         password
       });
 
-      Alert.alert("Éxito", `Bienvenido ${res.data.usuario.nombre}`, [
-        { text: "OK", onPress: () => router.replace("/tabs") } // reemplaza "/tabs" con la ruta principal de tu app
-      ]);
+      const usuario = res.data.usuario;
+
+      // ⚡ Lógica para redirigir admin o usuario normal
+      if (usuario.email === "admin@edu.com") {
+        router.replace("/admin");
+      } else {
+        router.replace("/tabs"); // ruta principal para usuarios normales
+      }
+
+      Alert.alert("Éxito", `Bienvenido ${usuario.nombre}`);
     } catch (error) {
       console.log(error.response?.data || error.message);
       Alert.alert("Error", error.response?.data?.message || "No se pudo iniciar sesión");
@@ -69,3 +76,4 @@ const styles = StyleSheet.create({
   btnText: { color: "#fff", fontWeight: "600", fontSize: 16 },
   link: { marginTop: 16, textAlign: "center", color: "#1E3A8A", fontWeight: "600" }
 });
+

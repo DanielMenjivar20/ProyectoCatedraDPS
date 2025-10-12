@@ -1,5 +1,6 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons'; // npm install @expo/vector-icons
 
 export default function UserList() {
   const router = useRouter();
@@ -10,7 +11,14 @@ export default function UserList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}> Gestionar Usuarios</Text>
+      {/* Flecha para volver */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#1E3A8A" />
+        <Text style={styles.backText}></Text>
+      </TouchableOpacity>
+
+      <Text style={styles.header}>Gestionar Usuarios</Text>
+
       <FlatList
         data={users}
         keyExtractor={(item) => String(item.id)}
@@ -38,6 +46,16 @@ export default function UserList() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#ffd900", padding: 16 },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 16,
+    color: "#1E3A8A",
+    marginLeft: 6,
+  },
   header: { fontSize: 22, fontWeight: "700", marginBottom: 20, color: "#1E3A8A" },
   card: { backgroundColor: "#fff", padding: 14, borderRadius: 10, marginBottom: 12, elevation: 2 },
   item: { fontSize: 15, marginBottom: 6 },

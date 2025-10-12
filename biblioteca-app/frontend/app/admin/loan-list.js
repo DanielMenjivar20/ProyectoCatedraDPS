@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from '@expo/vector-icons'; // npm install @expo/vector-icons
 
 export default function LoanList() {
   const router = useRouter();
@@ -11,7 +12,14 @@ export default function LoanList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Préstamos</Text>
+      {/* Header con flecha de volver */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
+          <Ionicons name="arrow-back" size={28} color="#0503a0ff" />
+        </TouchableOpacity>
+        <Text style={styles.header}>Préstamos</Text>
+      </View>
+
       <FlatList
         data={loans}
         keyExtractor={(item) => String(item.id)}
@@ -38,9 +46,19 @@ export default function LoanList() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#ffd900", padding: 20 },
-  header: { fontSize: 22, fontWeight: "700", marginBottom: 20, color: "#0503a0ff" },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 5, // Añadido para que haya espacio uniforme a ambos lados
+  },
+  iconButton: {
+    marginRight: 10,
+  },
+  header: { fontSize: 22, fontWeight: "700", color: "#0503a0ff" },
   card: { backgroundColor: "#fff", borderRadius: 8, padding: 12, marginBottom: 10, elevation: 2 },
   text: { fontSize: 15, marginBottom: 4 },
   button: { padding: 8, backgroundColor: "#000", borderRadius: 5, marginTop: 8, alignItems: "center" },
   buttonText: { color: "#fff", fontWeight: "bold" }
 });
+
